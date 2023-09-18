@@ -60,8 +60,9 @@ Status Segmenter::Initialize(
   moof_->tracks.resize(streams.size());
   fragmenters_.resize(streams.size());
   stream_durations_.resize(streams.size());
+  stream_sample_counts_.resize(streams.size());
 
-  for (uint32_t i = 0; i < streams.size(); ++i) {
+    for (uint32_t i = 0; i < streams.size(); ++i) {
     moof_->tracks[i].header.track_id = i + 1;
     if (streams[i]->stream_type() == kStreamVideo) {
       // Use the first video stream as the reference stream (which is 1-based).
@@ -142,6 +143,7 @@ Status Segmenter::AddSample(size_t stream_id, const MediaSample& sample) {
   if (sample_duration_ == 0)
     sample_duration_ = sample.duration();
   stream_durations_[stream_id] += sample.duration();
+  stream_samples_[stream_id] += 1;
   return Status::OK;
 }
 

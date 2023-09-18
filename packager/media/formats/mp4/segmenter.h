@@ -98,7 +98,12 @@ class Segmenter {
 
   /// @return The sample duration in the timescale of the media.
   ///         Returns 0 if no samples are added yet.
-  int32_t sample_duration() const { return sample_duration_; }
+  int32_t sample_duration() const {
+    if (stream_sample_counts_.empty() || stream_sample_counts_[0] == 0)
+      return 0;
+
+    return (int)(stream_durations_[0] / stream_sample_counts_[0]);
+  }
 
  protected:
   /// Update segmentation progress using ProgressListener.
@@ -148,6 +153,7 @@ class Segmenter {
   uint64_t accumulated_progress_ = 0u;
   int32_t sample_duration_ = 0;
   std::vector<uint64_t> stream_durations_;
+  std::vector<uint64_t> stream_sample_counts_;
   std::vector<KeyFrameInfo> key_frame_infos_;
 
   DISALLOW_COPY_AND_ASSIGN(Segmenter);
