@@ -62,7 +62,7 @@ Status Segmenter::Initialize(
   stream_durations_.resize(streams.size());
   stream_sample_counts_.resize(streams.size());
 
-    for (uint32_t i = 0; i < streams.size(); ++i) {
+  for (uint32_t i = 0; i < streams.size(); ++i) {
     moof_->tracks[i].header.track_id = i + 1;
     if (streams[i]->stream_type() == kStreamVideo) {
       // Use the first video stream as the reference stream (which is 1-based).
