@@ -380,16 +380,7 @@ Status MP4Muxer::UpdateEditListOffsetFromSample(const MediaSample& sample) {
   //     b) The second case is an audio CMAF track where each media sample's
   //        presentation time does not equal its composition time.
   const int64_t pts_dts_offset = pts - dts;
-  if (pts_dts_offset > 0) {
-    if (pts < 0) {
-      LOG(ERROR) << "Negative presentation timestamp (" << pts
-                 << ") is not supported when there is an offset between "
-                    "presentation timestamp and decoding timestamp ("
-                 << dts << ").";
-      return Status(error::MUXER_FAILURE,
-                    "Unsupported negative pts when there is an offset between "
-                    "pts and dts.");
-    }
+  if (pts >= 0 && pts_dts_offset > 0) {
     edit_list_offset_ = pts_dts_offset;
     return Status::OK;
   }
