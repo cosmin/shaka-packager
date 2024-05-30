@@ -268,6 +268,18 @@ struct CodecConfiguration : Box {
   std::vector<uint8_t> data;
 };
 
+struct AmbientViewingEnvironment : Box {
+  DECLARE_BOX_METHODS(AmbientViewingEnvironment);
+
+  // Semantics for ambient_illuminance, ambient_light_x and ambient_light_y
+  // values are in the HVEC (ITU-T H.265 | ISO/IEC 23008-2) document.
+  uint32_t ambient_illuminance;
+  uint16_t ambient_light_x;
+  uint16_t ambient_light_y;
+
+  std::vector<uint8_t> raw_box;
+};
+
 struct ColorParameters : Box {
   DECLARE_BOX_METHODS(ColorParameters);
 
@@ -309,6 +321,7 @@ struct VideoSampleEntry : Box {
   uint16_t height = 0u;
 
   ColorParameters colr;
+  AmbientViewingEnvironment amve;
   PixelAspectRatio pixel_aspect;
   ProtectionSchemeInfo sinf;
   CodecConfiguration codec_configuration;

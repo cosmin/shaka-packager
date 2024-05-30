@@ -1503,6 +1503,36 @@ size_t ColorParameters::ComputeSizeInternal() {
   return raw_box.size();
 }
 
+AmbientViewingEnvironment::AmbientViewingEnvironment() = default;
+AmbientViewingEnvironment::~AmbientViewingEnvironment() = default;
+
+FourCC AmbientViewingEnvironment::BoxType() const {
+  return FOURCC_amve;
+}
+
+bool AmbientViewingEnvironment::ReadWriteInternal(BoxBuffer* buffer) {
+  if (buffer->Reading()) {
+    BoxReader* reader = buffer->reader();
+    DCHECK(reader);
+
+    // Parse and store the raw box to make it easier to write out
+    raw_box.assign(reader->data(), reader->data() + reader->size());
+
+    RCHECK(reader->Read4(&ambient_illuminance) &&
+           reader->Read2(&ambient_light_x) &&
+           reader->Read2(&ambient_light_y));
+  } else {
+    // When writing, only need to write the raw_box.
+    DCHECK(!raw_box.empty());
+    buffer->writer()->AppendVector(raw_box);
+  }
+  return true;
+}
+
+size_t AmbientViewingEnvironment::ComputeSizeInternal() {
+  return raw_box.size();
+}
+
 PixelAspectRatio::PixelAspectRatio() = default;
 PixelAspectRatio::~PixelAspectRatio() = default;
 
@@ -1649,6 +1679,7 @@ bool VideoSampleEntry::ReadWriteInternal(BoxBuffer* buffer) {
   }
 
   RCHECK(buffer->TryReadWriteChild(&colr));
+  RCHECK(buffer->TryReadWriteChild(&amve));
   RCHECK(buffer->TryReadWriteChild(&pixel_aspect));
 
   // Somehow Edge does not support having sinf box before codec_configuration,
@@ -1672,7 +1703,7 @@ size_t VideoSampleEntry::ComputeSizeInternal() {
                 sizeof(kVideoFrameCount) + sizeof(kVideoDepth) +
                 colr.ComputeSize() + pixel_aspect.ComputeSize() +
                 sinf.ComputeSize() + codec_configuration.ComputeSize() +
-                kCompressorNameSize + 6 + 4 + 16 +
+                amve.ComputeSize() + kCompressorNameSize + 6 + 4 + 16 +
                 2;  // 6 + 4 bytes reserved, 16 + 2 bytes predefined.
   for (CodecConfiguration& codec_config : extra_codec_configs)
     size += codec_config.ComputeSize();
@@ -2530,7 +2561,7 @@ bool Movie::ReadWriteInternal(BoxBuffer* buffer) {
     // https://github.com/shaka-project/shaka-packager/issues/319 for details.
     // We do not care the content of metadata box in the source content, so just
     // skip reading the box.
-    RCHECK(buffer->TryReadWriteChild(&metadata));
+      RCHECK(buffer->TryReadWriteChild(&metadata));
     if (absl::GetFlag(FLAGS_mvex_before_trak)) {
       // |extends| has to be written before |tracks| to workaround Android
       // MediaExtractor bug which requires |mvex| to be placed before |trak|.

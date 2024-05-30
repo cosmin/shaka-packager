@@ -76,6 +76,7 @@ class VideoStreamInfo : public StreamInfo {
   uint32_t playback_rate() const { return playback_rate_; }
   const std::vector<uint8_t>& eme_init_data() const { return eme_init_data_; }
   const std::vector<uint8_t>& colr_data() const { return colr_data_; }
+  const std::vector<uint8_t>& amve_data() const { return amve_data_; }
 
   void set_supplemental_codec(const std::string supplemental_codec) {
     supplemental_codec_ = supplemental_codec;
@@ -113,6 +114,9 @@ class VideoStreamInfo : public StreamInfo {
   }
   void set_colr_data(const uint8_t* colr_data, size_t colr_data_size) {
     colr_data_.assign(colr_data, colr_data + colr_data_size);
+  }
+  void set_amve_data(const uint8_t* amve_data, size_t amve_data_size) {
+    amve_data_.assign(amve_data, amve_data + amve_data_size);
   }
 
  private:
@@ -158,6 +162,9 @@ class VideoStreamInfo : public StreamInfo {
 
   // Raw colr atom data. It is only applicable to the mp4 container.
   std::vector<uint8_t> colr_data_;
+
+  // Raw amve atom data.
+  std::vector<uint8_t> amve_data_;
 
   // Not using DISALLOW_COPY_AND_ASSIGN here intentionally to allow the compiler
   // generated copy constructor and assignment operator. Since the extra data is

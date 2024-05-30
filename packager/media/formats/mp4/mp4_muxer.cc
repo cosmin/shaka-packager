@@ -454,6 +454,7 @@ bool MP4Muxer::GenerateVideoTrak(const VideoStreamInfo* video_info,
   video.width = video_info->width();
   video.height = video_info->height();
   video.colr.raw_box = video_info->colr_data();
+  video.amve.raw_box = video_info->amve_data();
   video.codec_configuration.data = video_info->codec_config();
   if (!video.ParseExtraCodecConfigsVector(video_info->extra_config())) {
     LOG(ERROR) << "Malformed extra codec configs: "
